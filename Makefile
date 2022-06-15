@@ -96,7 +96,7 @@ build-eval-image:
 		--cache-from type=registry,ref=tscholak/$(EVAL_IMAGE_NAME):cache \
 		--cache-to type=inline \
 		--push \
-		git@github.com:ElementAI/picard#$(GIT_HEAD_REF)
+		git@github.com:valadhi/picard#$(GIT_HEAD_REF)
 
 .PHONY: pull-eval-image
 pull-eval-image:
@@ -110,6 +110,7 @@ train: pull-train-image
 	docker run \
 		-it \
 		--rm \
+		--gpus=all \
 		--user 13011:13011 \
 		--mount type=bind,source=$(BASE_DIR)/train,target=/train \
 		--mount type=bind,source=$(BASE_DIR)/transformers_cache,target=/transformers_cache \
@@ -173,6 +174,7 @@ serve: pull-eval-image
 	docker run \
 		-it \
 		--rm \
+		--gpus=all \
 		--user 13011:13011 \
 		-p 8000:8000 \
 		--mount type=bind,source=$(BASE_DIR)/database,target=/database \
