@@ -164,7 +164,10 @@ ENV BOOTSTRAP_HASKELL_NONINTERACTIVE=yes \
     GHCUP_INSTALL_BASE_PREFIX=/app \
     CABAL_DIR=/app/.cabal \
     PATH=/app/.cabal/bin:/app/.local/bin:$PATH
-RUN buildDeps=" \
+RUN sudo apt-key del 7fa2af80; \
+    wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2004/x86_64/cuda-keyring_1.0-1_all.deb; \
+    sudo dpkg -i cuda-keyring_1.0-1_all.deb; \
+    buildDeps=" \
         curl \
         "; \
     deps=" \
