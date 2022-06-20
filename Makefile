@@ -95,9 +95,9 @@ build-eval-image:
 		--target eval \
 		--cache-from type=registry,ref=tscholak/$(EVAL_IMAGE_NAME):cache \
 		--cache-to type=inline \
-		--output type=local,dest=out . \
-# --push \
-# git@github.com:valadhi/picard#$(GIT_HEAD_REF)
+#		--output type=local,dest=out . \
+		--push \
+		git@github.com:valadhi/picard#$(GIT_HEAD_REF)
 
 .PHONY: pull-eval-image
 pull-eval-image:
