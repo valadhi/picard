@@ -164,8 +164,8 @@ ENV BOOTSTRAP_HASKELL_NONINTERACTIVE=yes \
     GHCUP_INSTALL_BASE_PREFIX=/app \
     CABAL_DIR=/app/.cabal \
     PATH=/app/.cabal/bin:/app/.local/bin:$PATH
-RUN apt-key adv --fetch-keys https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2004/x86_64/3bf863cc.pub \
-RUN apt-key adv --fetch-keys https://developer.download.nvidia.com/compute/machine-learning/repos/ubuntu2004/x86_64/7fa2af80.pub \
+RUN rm /etc/apt/sources.list.d/cuda.list
+RUN rm /etc/apt/sources.list.d/nvidia-ml.list
 RUN buildDeps=" \
         curl \
         "; \
