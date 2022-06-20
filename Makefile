@@ -56,7 +56,7 @@ build-dev-image:
 		--cache-from type=registry,ref=tscholak/$(DEV_IMAGE_NAME):cache \
 		--cache-to type=inline \
 		--push \
-		git@github.com:ElementAI/picard#$(GIT_HEAD_REF)
+		git@github.com:valadhi/picard#$(GIT_HEAD_REF)
 
 .PHONY: pull-dev-image
 pull-dev-image:
