@@ -23,3 +23,11 @@ RUN mkdir -p $XDG_DATA_HOME \
     && mkdir -p $XDG_BIN_HOME \
     && mkdir -p $XDG_CONFIG_HOME \
     && chown -R $TOOLKIT_USER_ID:$TOOLKIT_GROUP_ID /app
+
+# ------------------------
+# Target: eval
+# ------------------------
+FROM dev as eval
+
+ARG TOOLKIT_USER_ID=13011
+ARG TOOLKIT_GROUP_ID=13011
