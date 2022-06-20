@@ -76,7 +76,7 @@ build-train-image:
 		--cache-from type=registry,ref=tscholak/$(TRAIN_IMAGE_NAME):cache \
 		--cache-to type=inline \
 		--push \
-		git@github.com:ElementAI/picard#$(GIT_HEAD_REF)
+		git@github.com:valadhi/picard#$(GIT_HEAD_REF)
 
 .PHONY: pull-train-image
 pull-train-image:
@@ -95,9 +95,8 @@ build-eval-image:
 		--target eval \
 		--cache-from type=registry,ref=tscholak/$(EVAL_IMAGE_NAME):cache \
 		--cache-to type=inline \
-#		--output type=local,dest=out . \
 		--push \
-		git@github.com:valadhi/picard#$(GIT_HEAD_REF)
+		git@github.com:ElementAI/picard#$(GIT_HEAD_REF)
 
 .PHONY: pull-eval-image
 pull-eval-image:
