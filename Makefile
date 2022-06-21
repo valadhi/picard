@@ -171,7 +171,7 @@ eval_cosql: pull-eval-image
 serve: pull-eval-image
 	mkdir -p -m 777 database
 	mkdir -p -m 777 transformers_cache
-	docker run \
+	docker run -d \
 		-it \
 		--rm \
 		--gpus=all \
@@ -180,8 +180,7 @@ serve: pull-eval-image
 		--mount type=bind,source=$(BASE_DIR)/database,target=/database \
 		--mount type=bind,source=$(BASE_DIR)/transformers_cache,target=/transformers_cache \
 		--mount type=bind,source=$(BASE_DIR)/configs,target=/app/configs \
-		tscholak/$(EVAL_IMAGE_NAME):$(GIT_HEAD_REF) \
-		/bin/bash -c "python seq2seq/serve_seq2seq.py configs/serve.json"
+		tscholak/$(EVAL_IMAGE_NAME):$(GIT_HEAD_REF)
 
 .PHONY: prediction_output
 prediction_output: pull-eval-image
