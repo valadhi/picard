@@ -135,6 +135,7 @@ class Text2SQLGenerationPipeline(Text2TextGenerationPipeline):
             schema_serialization_with_db_content=self.schema_serialization_with_db_content,
             normalize_query=self.normalize_query,
         )
+        print(serialized_schema)
         return spider_get_input(question=input.utterance, serialized_schema=serialized_schema, prefix=prefix)
 
     def postprocess(self, model_outputs: dict, return_type=ReturnType.TEXT, clean_up_tokenization_spaces=False):
@@ -298,6 +299,107 @@ class ConversationalText2SQLGenerationPipeline(Text2TextGenerationPipeline):
                     )
                     .split("|", 1)[-1]
                     .strip()
+                }
+            records.append(record)
+        return records
+
+
+@dataclass
+class TextSchema2SQLInput(object):
+    utterance: str
+    db_id: str
+
+class TextSchema2SQLGenerationPipeline(Text2SQLGenerationPipeline):
+    def __init__(self, *args, **kwargs):
+        self.db_path: str = kwargs.pop("db_path")
+        self.prefix: Optional[str] = kwargs.pop("prefix", None)
+        self.normalize_query: bool = kwargs.pop("normalize_query", True)
+        self.schema_serialization_type: str = kwargs.pop("schema_serialization_type", "peteshaw")
+        self.schema_serialization_randomized: bool = kwargs.pop("schema_serialization_randomized", False)
+        self.schema_serialization_with_db_id: bool = kwargs.pop("schema_serialization_with_db_id", True)
+        self.schema_serialization_with_db_content: bool = kwargs.pop("schema_serialization_with_db_content", True)
+        self.schema_cache: Dict[str, dict] = dict()
+        super().__init__(*args, **kwargs)
+
+    def __call__(self, inputs: Union[Text2SQLInput, List[Text2SQLInput]], *args, **kwargs):
+        result = super().__call__(inputs, *args, **kwargs)
+        if (
+                isinstance(inputs, list)
+                and all(isinstance(el, Text2SQLInput) for el in inputs)
+                and all(len(res) == 1 for res in result)
+        ):
+            return [res[0] for res in result]
+        return result
+
+    def preprocess(
+            self,
+            inputs: Union[Text2SQLInput, List[Text2SQLInput]],
+            *args,
+            truncation=TruncationStrategy.DO_NOT_TRUNCATE,
+            **kwargs
+    ) -> BatchEncoding:
+        encodings = self._parse_and_tokenize(inputs, *args, truncation=truncation, **kwargs)
+        return encodings
+
+    def _parse_and_tokenize(
+            self,
+            inputs: Union[Text2SQLInput, List[Text2SQLInput]],
+            *args,
+            truncation: TruncationStrategy
+    ) -> BatchEncoding:
+        if isinstance(inputs, list):
+            if self.tokenizer.pad_token_id is None:
+                raise ValueError("Please make sure that the tokenizer has a pad_token_id when using a batch input")
+            inputs = [self._pre_process(input=input) for input in inputs]
+            padding = True
+        elif isinstance(inputs, Text2SQLInput):
+            inputs = self._pre_process(input=inputs)
+            padding = False
+        else:
+            raise ValueError(
+                f" `inputs`: {inputs} have the wrong format. The should be either of type `Text2SQLInput` or type `List[Text2SQLInput]`"
+            )
+        encodings = self.tokenizer(inputs, padding=padding, truncation=truncation, return_tensors=self.framework)
+        # This is produced by tokenizers but is an invalid generate kwargs
+        if "token_type_ids" in encodings:
+            del encodings["token_type_ids"]
+        return encodings
+
+    def _pre_process(self, input: Text2SQLInput) -> str:
+        prefix = self.prefix if self.prefix is not None else ""
+        if input.db_id not in self.schema_cache:
+            self.schema_cache[input.db_id] = get_schema(db_path=self.db_path, db_id=input.db_id)
+        schema = self.schema_cache[input.db_id]
+        if hasattr(self.model, "add_schema"):
+            self.model.add_schema(db_id=input.db_id, db_info=schema)
+        serialized_schema = serialize_schema(
+            question=input.utterance,
+            db_path=self.db_path,
+            db_id=input.db_id,
+            db_column_names=schema["db_column_names"],
+            db_table_names=schema["db_table_names"],
+            schema_serialization_type=self.schema_serialization_type,
+            schema_serialization_randomized=self.schema_serialization_randomized,
+            schema_serialization_with_db_id=self.schema_serialization_with_db_id,
+            schema_serialization_with_db_content=self.schema_serialization_with_db_content,
+            normalize_query=self.normalize_query,
+        )
+        return spider_get_input(question=input.utterance, serialized_schema=serialized_schema, prefix=prefix)
+
+    def postprocess(self, model_outputs: dict, return_type=ReturnType.TEXT, clean_up_tokenization_spaces=False):
+        records = []
+        for output_ids in model_outputs["output_ids"][0]:
+            if return_type == ReturnType.TENSORS:
+                record = {f"{self.return_name}_token_ids": model_outputs}
+            elif return_type == ReturnType.TEXT:
+                record = {
+                    f"{self.return_name}_text": self.tokenizer.decode(
+                        output_ids,
+                        skip_special_tokens=True,
+                        clean_up_tokenization_spaces=clean_up_tokenization_spaces,
+                    )
+                        .split("|", 1)[-1]
+                        .strip()
                 }
             records.append(record)
         return records
