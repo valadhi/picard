@@ -172,7 +172,7 @@ eval_cosql: pull-eval-image
 serve: pull-eval-image
 	mkdir -p -m 777 database
 	mkdir -p -m 777 transformers_cache
-	docker run -d \
+	docker run \
 		-it \
 		--rm \
 		--gpus=all \
