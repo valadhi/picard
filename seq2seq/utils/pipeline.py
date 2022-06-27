@@ -135,7 +135,6 @@ class Text2SQLGenerationPipeline(Text2TextGenerationPipeline):
             schema_serialization_with_db_content=self.schema_serialization_with_db_content,
             normalize_query=self.normalize_query,
         )
-        print(serialized_schema)
         return spider_get_input(question=input.utterance, serialized_schema=serialized_schema, prefix=prefix)
 
     def postprocess(self, model_outputs: dict, return_type=ReturnType.TEXT, clean_up_tokenization_spaces=False):
@@ -309,7 +308,7 @@ class TextSchema2SQLInput(object):
     utterance: str
     db_id: str
 
-class TextSchema2SQLGenerationPipeline(Text2SQLGenerationPipeline):
+class TextSchema2SQLGenerationPipeline(Text2TextGenerationPipeline):
     def __init__(self, *args, **kwargs):
         self.db_path: str = kwargs.pop("db_path")
         self.prefix: Optional[str] = kwargs.pop("prefix", None)
@@ -367,23 +366,31 @@ class TextSchema2SQLGenerationPipeline(Text2SQLGenerationPipeline):
 
     def _pre_process(self, input: Text2SQLInput) -> str:
         prefix = self.prefix if self.prefix is not None else ""
-        if input.db_id not in self.schema_cache:
-            self.schema_cache[input.db_id] = get_schema(db_path=self.db_path, db_id=input.db_id)
-        schema = self.schema_cache[input.db_id]
+
+        db_id = input.db_id.split('|')[1].strip()
+        serialized_schema = input.db_id
+        self.schema_cache[db_id] = serialized_schema
+        schema = self.schema_cache[db_id]
         if hasattr(self.model, "add_schema"):
-            self.model.add_schema(db_id=input.db_id, db_info=schema)
-        serialized_schema = serialize_schema(
-            question=input.utterance,
-            db_path=self.db_path,
-            db_id=input.db_id,
-            db_column_names=schema["db_column_names"],
-            db_table_names=schema["db_table_names"],
-            schema_serialization_type=self.schema_serialization_type,
-            schema_serialization_randomized=self.schema_serialization_randomized,
-            schema_serialization_with_db_id=self.schema_serialization_with_db_id,
-            schema_serialization_with_db_content=self.schema_serialization_with_db_content,
-            normalize_query=self.normalize_query,
-        )
+            self.model.add_schema(db_id=db_id, db_info=schema)
+
+        # if input.db_id not in self.schema_cache:
+        #     self.schema_cache[input.db_id] = get_schema(db_path=self.db_path, db_id=input.db_id)
+        # schema = self.schema_cache[input.db_id]
+        # if hasattr(self.model, "add_schema"):
+        #     self.model.add_schema(db_id=input.db_id, db_info=schema)
+        # serialized_schema = serialize_schema(
+        #     question=input.utterance,
+        #     db_path=self.db_path,
+        #     db_id=input.db_id,
+        #     db_column_names=schema["db_column_names"],
+        #     db_table_names=schema["db_table_names"],
+        #     schema_serialization_type=self.schema_serialization_type,
+        #     schema_serialization_randomized=self.schema_serialization_randomized,
+        #     schema_serialization_with_db_id=self.schema_serialization_with_db_id,
+        #     schema_serialization_with_db_content=self.schema_serialization_with_db_content,
+        #     normalize_query=self.normalize_query,
+        # )
         return spider_get_input(question=input.utterance, serialized_schema=serialized_schema, prefix=prefix)
 
     def postprocess(self, model_outputs: dict, return_type=ReturnType.TEXT, clean_up_tokenization_spaces=False):

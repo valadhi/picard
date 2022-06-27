@@ -20,7 +20,7 @@ from transformers.models.auto import AutoConfig, AutoTokenizer, AutoModelForSeq2
 from fastapi import FastAPI, HTTPException
 from uvicorn import run
 from sqlite3 import Connection, connect, OperationalError
-from seq2seq.utils.pipeline import Text2SQLGenerationPipeline, Text2SQLInput, get_schema
+from seq2seq.utils.pipeline import Text2SQLGenerationPipeline, Text2SQLInput, get_schema, TextSchema2SQLGenerationPipeline
 from seq2seq.utils.picard_model_wrapper import PicardArguments, PicardLauncher, with_picard
 from seq2seq.utils.dataset import DataTrainingArguments
 
@@ -101,7 +101,7 @@ def main():
         )
 
         # Initalize generation pipeline
-        pipe = Text2SQLGenerationPipeline(
+        pipe = TextSchema2SQLGenerationPipeline(
             model=model,
             tokenizer=tokenizer,
             db_path=backend_args.db_path,
@@ -135,13 +135,15 @@ def main():
                     inputs=Text2SQLInput(utterance=question, db_id=db_id),
                     num_return_sequences=data_training_args.num_return_sequences
                 )
+                print(outputs)
             except OperationalError as e:
                 raise HTTPException(status_code=404, detail=e.args[0])
-            try:
-                conn = connect(backend_args.db_path + "/" + db_id + "/" + db_id + ".sqlite")
-                return [response(query=output["generated_text"], conn=conn) for output in outputs]
-            finally:
-                conn.close()
+            return outputs[0]["generated_text"] if (len(outputs) > 0 and "generated_text" in outputs[0]) else ""
+            # try:
+            #     conn = connect(backend_args.db_path + "/" + db_id + "/" + db_id + ".sqlite")
+            #     return [response(query=output["generated_text"], conn=conn) for output in outputs]
+            # finally:
+                # conn.close()
 
         # Run app
         run(app=app, host=backend_args.host, port=backend_args.port)
