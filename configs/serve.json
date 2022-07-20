@@ -11,10 +11,10 @@
     "cache_dir": "/transformers_cache",
     "num_beams": 4,
     "num_return_sequences": 1,
-    "use_picard": false,
+    "use_picard": true,
     "launch_picard": true,
     "picard_mode": "parse_with_guards",
     "picard_schedule": "incremental",
     "picard_max_tokens_to_check": 2,
-    "device": 0
+    "device": -1
 }

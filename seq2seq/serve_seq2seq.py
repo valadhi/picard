@@ -102,6 +102,7 @@ def main():
 
         # Initalize generation pipeline
         pipe = TextSchema2SQLGenerationPipeline(
+        # pipe = Text2SQLGenerationPipeline(
             model=model,
             tokenizer=tokenizer,
             db_path=backend_args.db_path,
@@ -130,6 +131,7 @@ def main():
 
         @app.get("/ask/{db_id}/{question}")
         def ask(db_id: str, question: str):
+            # db_id = " | insurance | Earned_Premiums : Id,WrittenPremium,EarnedPremium,IncurredClaims,EarnedRisks,NumberOfClaims,Date,Brand_Id,County_Id,Age,Customer_Id"
             try:
                 outputs = pipe(
                     inputs=Text2SQLInput(utterance=question, db_id=db_id),

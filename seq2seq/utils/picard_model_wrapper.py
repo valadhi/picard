@@ -127,7 +127,22 @@ def with_picard(
             await _register_tokenizer(picard_client=client)
 
     async def _register_schema(db_id: str, db_info: dict, picard_client: Picard) -> None:
-        sql_schema = get_picard_schema(**db_info)
+        # sql_schema = get_picard_schema(**db_info)
+
+        print(db_info)
+        db_info = {'db_table_names': [], 'db_column_names': {'table_id': [-1], 'column_name': ['*']}}
+        start_from = 2
+        for table_id, table_info in enumerate(db_info.split(sep="|")[start_from:]):
+            table_info_extract = table_info.strip().split(":")
+            table_name = table_info_extract[0]
+            table_columns = [t.strip() for t in table_info_extract[1].split(",")]
+            db_info['db_table_names'].append(table_name)
+            db_info['db_column_names']['table_id'].extend([table_id for c in table_columns])
+            db_info['db_column_names']['column_name'].extend(table_columns)
+        print(db_info)
+
+        sql_schema = get_picard_schema_minimal(db_info)
+        print(sql_schema)
         try:
             await picard_client.registerSQLSchema(db_id, sql_schema)
         except RegisterSQLSchemaException:
@@ -403,6 +418,31 @@ def _get_picard_column_type(column_type: str) -> ColumnType:
     else:
         raise ValueError(f"unexpected column type {column_type}")
 
+def get_picard_schema_minimal(
+        db_table_names: List[str],
+        db_column_names: Dict[str, Union[List[str], List[int]]],
+) -> SQLSchema:
+    star_id = next((c_id for c_id, c_name in enumerate(db_column_names["column_name"]) if c_name == "*"))
+    column_names = dict(
+        (str(c_id), c_name) for c_id, c_name in enumerate(db_column_names["column_name"]) if c_id != star_id
+    )
+    table_names = dict((str(t_id), t_name) for t_id, t_name in enumerate(db_table_names))
+    column_to_table = dict(
+        (str(c_id), str(t_id))
+        for c_id, (t_id, _c_name) in enumerate(zip(db_column_names["table_id"], db_column_names["column_name"]))
+        if c_id != star_id
+    )
+    table_to_columns = collections.defaultdict(list)
+    for c_id, (t_id, _c_name) in enumerate(zip(db_column_names["table_id"], db_column_names["column_name"])):
+        if c_id == star_id:
+            continue
+        table_to_columns[str(t_id)].append(str(c_id))
+    return SQLSchema(
+        columnNames=column_names,
+        tableNames=table_names,
+        columnToTable=column_to_table,
+        tableToColumns=table_to_columns,
+    )
 
 def get_picard_schema(
     db_table_names: List[str],
@@ -437,10 +477,10 @@ def get_picard_schema(
     primary_keys = [str(c_id) for c_id in db_primary_keys["column_id"] if c_id != star_id]
     return SQLSchema(
         columnNames=column_names,
-        columnTypes=column_types,
+        # columnTypes=column_types,
         tableNames=table_names,
         columnToTable=column_to_table,
         tableToColumns=table_to_columns,
-        foreignKeys=foreign_keys,
-        primaryKeys=primary_keys,
+        # foreignKeys=foreign_keys,
+        # primaryKeys=primary_keys,
     )
