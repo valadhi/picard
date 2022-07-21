@@ -129,20 +129,18 @@ def with_picard(
     async def _register_schema(db_id: str, db_info: dict, picard_client: Picard) -> None:
         # sql_schema = get_picard_schema(**db_info)
 
-        print(db_info)
-        db_info = {'db_table_names': [], 'db_column_names': {'table_id': [-1], 'column_name': ['*']}}
+        db_info_template = {'db_table_names': [], 'db_column_names': {'table_id': [-1], 'column_name': ['*']}}
         start_from = 2
         for table_id, table_info in enumerate(db_info.split(sep="|")[start_from:]):
             table_info_extract = table_info.strip().split(":")
             table_name = table_info_extract[0]
             table_columns = [t.strip() for t in table_info_extract[1].split(",")]
-            db_info['db_table_names'].append(table_name)
-            db_info['db_column_names']['table_id'].extend([table_id for c in table_columns])
-            db_info['db_column_names']['column_name'].extend(table_columns)
-        print(db_info)
+            db_info_template['db_table_names'].append(table_name.strip())
+            db_info_template['db_column_names']['table_id'].extend([table_id for c in table_columns])
+            db_info_template['db_column_names']['column_name'].extend(table_columns)
+        db_info = db_info_template
+        sql_schema = get_picard_schema_minimal(**db_info)
 
-        sql_schema = get_picard_schema_minimal(db_info)
-        print(sql_schema)
         try:
             await picard_client.registerSQLSchema(db_id, sql_schema)
         except RegisterSQLSchemaException:

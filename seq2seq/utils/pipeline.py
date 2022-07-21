@@ -370,14 +370,10 @@ class TextSchema2SQLGenerationPipeline(Text2TextGenerationPipeline):
     def _pre_process(self, input: Text2SQLInput) -> str:
         prefix = self.prefix if self.prefix is not None else ""
 
-        db_id = input.db_id.split('|')[1].strip()
-        serialized_schema = input.db_id
+        db_id = input.db_id.split('|')[0].strip()
+        serialized_schema = ' | ' + input.db_id
         self.schema_cache[db_id] = serialized_schema
         schema = self.schema_cache[db_id]
-
-        # print("SCHEMA")
-        # print(schema)
-
         if hasattr(self.model, "add_schema"):
             self.model.add_schema(db_id=db_id, db_info=schema)
 
@@ -398,7 +394,6 @@ class TextSchema2SQLGenerationPipeline(Text2TextGenerationPipeline):
         #     schema_serialization_with_db_content=self.schema_serialization_with_db_content,
         #     normalize_query=self.normalize_query,
         # )
-        print(serialized_schema)
         return spider_get_input(question=input.utterance, serialized_schema=serialized_schema, prefix=prefix)
 
     def postprocess(self, model_outputs: dict, return_type=ReturnType.TEXT, clean_up_tokenization_spaces=False):
