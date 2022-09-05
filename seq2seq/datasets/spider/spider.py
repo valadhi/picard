@@ -122,6 +122,7 @@ class Spider(datasets.GeneratorBasedBuilder):
     def _generate_examples(
         self, data_filepaths: List[str], db_path: str
     ) -> Generator[Tuple[int, Dict[str, Any]], None, None]:
+        # self.include_train_others is always False - dunno what the purpose of it used to be
         """This function returns the examples in the raw (text) form."""
         for data_filepath in data_filepaths:
             logger.info("generating examples from = %s", data_filepath)

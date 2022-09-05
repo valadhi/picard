@@ -68,7 +68,7 @@ def main():
 
     # Initialize config
     config = AutoConfig.from_pretrained(
-        backend_args.model_path,
+        pretrained_model_name_or_path=backend_args.model_path,
         cache_dir=backend_args.cache_dir,
         max_length=data_training_args.max_target_length,
         num_beams=data_training_args.num_beams,

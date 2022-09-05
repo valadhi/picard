@@ -139,6 +139,7 @@ class DataArguments:
     dataset_paths: Dict[str, str] = field(
         default_factory=lambda: {
             "spider": "./seq2seq/datasets/spider",
+            "custom_spider": "./seq2seq/datasets/custom",
             "cosql": "./seq2seq/datasets/cosql",
             "spider_realistic": "./seq2seq/datasets/spider_realistic",
             "spider_syn": "./seq2seq/datasets/spider_syn",
@@ -155,6 +156,7 @@ class DataArguments:
     metric_paths: Dict[str, str] = field(
         default_factory=lambda: {
             "spider": "./seq2seq/metrics/spider",
+            "custom_spider": "./seq2seq/metrics/custom_spider",
             "spider_realistic" : "./seq2seq/metrics/spider",
             "cosql": "./seq2seq/metrics/cosql",
             "spider_syn":"./seq2seq/metrics/spider",
@@ -203,8 +205,8 @@ def _get_schemas(examples: Dataset) -> Dict[str, dict]:
             schemas[ex["db_id"]] = {
                 "db_table_names": ex["db_table_names"],
                 "db_column_names": ex["db_column_names"],
-                "db_column_types": ex["db_column_types"],
-                "db_primary_keys": ex["db_primary_keys"],
+                # "db_column_types": ex["db_column_types"],
+                # "db_primary_keys": ex["db_primary_keys"],
                 "db_foreign_keys": ex["db_foreign_keys"],
             }
     return schemas

@@ -30,6 +30,7 @@ from seq2seq.utils.dataset import DataTrainingArguments, DataArguments
 from seq2seq.utils.dataset_loader import load_dataset
 from seq2seq.utils.spider import SpiderTrainer
 from seq2seq.utils.cosql import CoSQLTrainer
+from seq2seq.utils.custom import CustomTrainer
 
 
 def main() -> None:
@@ -199,6 +200,8 @@ def main() -> None:
             trainer = SpiderTrainer(**trainer_kwargs)
         elif data_args.dataset in ["cosql", "cosql+spider"]:
             trainer = CoSQLTrainer(**trainer_kwargs)
+        elif data_args.dataset in ["custom_spider"]:
+            trainer = CustomTrainer(**trainer_kwargs)
         else:
             raise NotImplementedError()
 
@@ -249,7 +252,7 @@ def main() -> None:
             trainer.save_metrics("eval", metrics)
 
         # Testing
-        if training_args.do_predict:
+        if training_args.do_predict or True:
             logger.info("*** Predict ***")
             for section, test_split in dataset_splits.test_splits.items():
                 results = trainer.predict(

@@ -55,6 +55,9 @@ def spider_pre_process_function(
         for question, serialized_schema in zip(batch["question"], batch["serialized_schema"])
     ]
 
+    # print("Here are my inputs! #####")
+    # print(inputs)
+
     model_inputs: dict = tokenizer(
         inputs,
         max_length=max_source_length,

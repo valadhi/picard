@@ -58,6 +58,14 @@ def load_dataset(
         data_training_args=data_training_args,
         tokenizer=tokenizer,
     )
+    # CUSTOM SPIDER DATASET
+    _custom_spider_dataset_dict: Callable[[], DatasetDict] = lambda: datasets.load.load_dataset(
+        path=data_args.dataset_paths["custom_spider"], cache_dir=model_args.cache_dir
+    )
+    _custom_spider_metric: Callable[[], Metric] = lambda: datasets.load.load_metric(
+        path=data_args.metric_paths["custom_spider"], config_name=data_args.metric_config,
+        test_suite_db_dir=data_args.test_suite_db_dir
+    )
 
     _cosql_dataset_dict: Callable[[], DatasetDict] = lambda: datasets.load.load_dataset(
         path=data_args.dataset_paths["cosql"], cache_dir=model_args.cache_dir
@@ -186,6 +194,44 @@ def load_dataset(
             test_splits=cosql_dataset_splits.test_splits,
             schemas=schemas,
         )
+    elif data_args.dataset == "custom_spider":
+        metric = _spider_metric()
+        custom_spider_dataset_splits = prepare_splits(
+            dataset_dict=_custom_spider_dataset_dict(),
+            add_serialized_schema=_spider_add_serialized_schema,
+            pre_process_function=_spider_pre_process_function,
+            **_prepare_splits_kwargs,
+        )
+        spider_training_split = (
+            _prepare_train_split(
+                dataset=_spider_dataset_dict()["train"],
+                data_training_args=data_training_args,
+                add_serialized_schema=_spider_add_serialized_schema,
+                pre_process_function=_spider_pre_process_function,
+            )
+        )
+        dataset: Dataset = concatenate_datasets(
+            dsets=[custom_spider_dataset_splits.train_split.dataset, spider_training_split.dataset]
+        )
+        train_split = TrainSplit(
+            dataset=dataset,
+            schemas={**spider_training_split.schemas, **custom_spider_dataset_splits.train_split.schemas},
+        )
+        schemas = {
+            **custom_spider_dataset_splits.schemas,
+            **(spider_training_split.schemas if spider_training_split is not None else {}),
+        }
+
+        # dataset = custom_spider_dataset_splits.train_split.dataset
+        # train_split = TrainSplit(dataset=dataset,schemas={**custom_spider_dataset_splits.train_split.schemas},)
+        # schemas = {**custom_spider_dataset_splits.schemas,}
+        dataset_splits = DatasetSplits(
+            train_split=train_split,
+            eval_split=custom_spider_dataset_splits.eval_split,
+            test_splits=custom_spider_dataset_splits.test_splits,
+            schemas=schemas,
+        )
+
     else:
         raise NotImplementedError()
 
