@@ -210,21 +210,21 @@ def load_dataset(
                 pre_process_function=_spider_pre_process_function,
             )
         )
-        dataset: Dataset = concatenate_datasets(
-            dsets=[custom_spider_dataset_splits.train_split.dataset, spider_training_split.dataset]
-        )
-        train_split = TrainSplit(
-            dataset=dataset,
-            schemas={**spider_training_split.schemas, **custom_spider_dataset_splits.train_split.schemas},
-        )
-        schemas = {
-            **custom_spider_dataset_splits.schemas,
-            **(spider_training_split.schemas if spider_training_split is not None else {}),
-        }
+        # dataset: Dataset = concatenate_datasets(
+        #     dsets=[custom_spider_dataset_splits.train_split.dataset, spider_training_split.dataset]
+        # )
+        # train_split = TrainSplit(
+        #     dataset=dataset,
+        #     schemas={**spider_training_split.schemas, **custom_spider_dataset_splits.train_split.schemas},
+        # )
+        # schemas = {
+        #     **custom_spider_dataset_splits.schemas,
+        #     **(spider_training_split.schemas if spider_training_split is not None else {}),
+        # }
 
-        # dataset = custom_spider_dataset_splits.train_split.dataset
-        # train_split = TrainSplit(dataset=dataset,schemas={**custom_spider_dataset_splits.train_split.schemas},)
-        # schemas = {**custom_spider_dataset_splits.schemas,}
+        dataset = custom_spider_dataset_splits.train_split.dataset
+        train_split = TrainSplit(dataset=dataset,schemas={**custom_spider_dataset_splits.train_split.schemas},)
+        schemas = {**custom_spider_dataset_splits.schemas,}
         dataset_splits = DatasetSplits(
             train_split=train_split,
             eval_split=custom_spider_dataset_splits.eval_split,

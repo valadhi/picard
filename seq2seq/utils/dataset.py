@@ -207,7 +207,7 @@ def _get_schemas(examples: Dataset) -> Dict[str, dict]:
                 "db_column_names": ex["db_column_names"],
                 # "db_column_types": ex["db_column_types"],
                 # "db_primary_keys": ex["db_primary_keys"],
-                "db_foreign_keys": ex["db_foreign_keys"],
+                # "db_foreign_keys": ex["db_foreign_keys"],
             }
     return schemas
 
