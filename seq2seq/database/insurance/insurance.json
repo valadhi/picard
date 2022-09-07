@@ -1,0 +1,187 @@
+{
+  "config": {
+    "db_table_names": [
+      "Earned_Premiums"
+    ],
+    "db_column_names": [
+        {
+          "table_id": -1,
+          "column_name": "*"
+        },
+        {
+          "table_id": 0,
+          "column_name": "Id"
+        },
+        {
+          "table_id": 0,
+          "column_name": "WrittenPremium"
+        },
+        {
+          "table_id": 0,
+          "column_name": "EarnedPremium"
+        },
+        {
+          "table_id": 0,
+          "column_name": "IncurredClaims"
+        },
+              {
+          "table_id": 0,
+          "column_name": "EarnedRisks"
+        },
+        {
+          "table_id": 0,
+          "column_name": "NumberOfClaims"
+        },
+        {
+          "table_id": 0,
+          "column_name": "Date"
+        },
+        {
+          "table_id": 0,
+          "column_name": "Brand_Id"
+        },
+              {
+          "table_id": 0,
+          "column_name": "County_Id"
+        },
+        {
+          "table_id": 0,
+          "column_name": "Age"
+        },
+        {
+          "table_id": 0,
+          "column_name": "Customer_Id"
+        }
+    ],
+    "db_foreign_keys": [
+
+    ]
+  },
+  "data": [
+    {
+      "db_id": "insurance",
+      "query": "select sum(WrittenPremium) from Earned_Premiums where (unixepoch() - unixepoch(Date)) < 86400*7",
+      "question": "get written premiums for the last 7 days"
+    },
+      {
+      "db_id": "insurance",
+      "query": "select sum(WrittenPremium) from Earned_Premiums where (unixepoch() - unixepoch(Date)) < 86400*10",
+      "question": "get written premiums for the last 10 days"
+    },
+        {
+      "db_id": "insurance",
+      "query": "select sum(WrittenPremium) from Earned_Premiums where (unixepoch() - unixepoch(Date)) < 86400*7",
+      "question": "get written premiums for the previous 7 days"
+    },
+      {
+      "db_id": "insurance",
+      "query": "select sum(WrittenPremium) from Earned_Premiums where (unixepoch() - unixepoch(Date)) < 86400*10",
+      "question": "get written premiums for the previous 10 days"
+    },
+    {
+      "db_id": "insurance",
+      "query": "select sum(WrittenPremium) from Earned_Premiums where (unixepoch() - unixepoch(Date)) < 86400*6",
+      "question": "get written premiums for the previous 6 days"
+    },
+      {
+      "db_id": "insurance",
+      "query": "select sum(WrittenPremium) from Earned_Premiums where (unixepoch() - unixepoch(Date)) < 86400*8",
+      "question": "get written premiums for the last 8 days"
+    },
+    {
+      "db_id": "insurance",
+      "query": "select sum(WrittenPremium) from Earned_Premiums where (unixepoch() - unixepoch(Date)) < 86400*7",
+      "question": "get written premiums for the last 7 days"
+    },
+    {
+      "db_id": "insurance",
+      "query": "select sum(WrittenPremium) from Earned_Premiums where (unixepoch(Date) - unixepoch()) < 86400*7",
+      "question": "get written premiums for the next 7 days"
+    },
+    {
+      "db_id": "insurance",
+      "query": "select sum(WrittenPremium) from Earned_Premiums where Date > unixepoch()",
+      "question": "get written premiums where date is in the future"
+    },
+    {
+      "db_id": "insurance",
+      "query": "select sum(WrittenPremium) from Earned_Premiums where where Date < unixepoch()",
+      "question": "get all past data for written premiums"
+    },
+    {
+      "db_id": "insurance",
+      "query": "select sum(WrittenPremium) from Earned_Premiums where where Date < unixepoch()",
+      "question": "get written premiums from the past"
+    },
+      {
+      "db_id": "insurance",
+      "query": "select sum(WrittenPremium) from Earned_Premiums where (unixepoch() - unixepoch(Date)) < 86400*10",
+      "question": "get written premiums for the last 10 days"
+    },
+    {
+      "db_id": "insurance",
+      "query": "select sum(IncurredClaims)/sum(EarnedPremium) from Earned_Premiums where (unixepoch() - unixepoch(Date)) < 86400*10",
+      "question": "get loss ratio for the last 10 days"
+    },
+    {
+      "db_id": "insurance",
+      "query": "select sum(IncurredClaims)/sum(EarnedPremium) from Earned_Premiums where (unixepoch() - unixepoch(Date)) < 86400*2",
+      "question": "get loss ratio for the last 2 days"
+    },
+    {
+      "db_id": "insurance",
+      "query": "select sum(IncurredClaims)/sum(EarnedPremium) from Earned_Premiums where where Date < unixepoch()",
+      "question": "get all past data for loss ratio"
+    },
+    {
+      "db_id": "insurance",
+      "query": "select sum(IncurredClaims)/sum(EarnedPremium) from Earned_Premiums where where Date < unixepoch()",
+      "question": "get loss ratio from the past"
+    },
+    {
+      "db_id": "insurance",
+      "query": "select sum(IncurredClaims)/sum(EarnedPremium) from Earned_Premiums where Age>50",
+      "question": "get loss ratio for customers older than 50"
+    },
+    {
+      "db_id": "insurance",
+      "query": "select sum(IncurredClaims)/sum(EarnedPremium) from Earned_Premiums",
+      "question": "get loss ratio"
+    },
+    {
+      "db_id": "insurance",
+      "query": "select sum(IncurredClaims)/sum(EarnedPremium) from Earned_Premiums",
+      "question": "what is the loss ratio"
+    },
+    {
+      "db_id": "insurance",
+      "query": "select sum(IncurredClaims)/sum(EarnedPremium) from Earned_Premiums",
+      "question": "get loss ratio"
+    },
+    {
+      "db_id": "insurance",
+      "query": "select sum(WrittenPremium) from Earned_Premiums",
+      "question": "get written premiums"
+    },
+    {
+      "db_id": "insurance",
+      "query": "select sum(WrittenPremium) from Earned_Premiums",
+      "question": "give me the written premiums"
+    },
+    {
+      "db_id": "insurance",
+      "query": "select sum(WrittenPremium) from Earned_Premiums where Age<30",
+      "question": "give me the written premiums for customers younger than 30"
+    },
+    {
+      "db_id": "insurance",
+      "query": "select sum(IncurredClaims)/sum(EarnedPremium) from Earned_Premiums where unixepoch() - unixepoch(Date) < 86400*10 and Age>50",
+      "question": "get loss ratio for customers older than 50 for last 10 days"
+    },
+    {
+      "db_id": "insurance",
+      "query": "select sum(IncurredClaims)/sum(EarnedPremium) from Earned_Premiums where unixepoch() - unixepoch(Date) < 86400*10 and Age>50",
+      "question": "get loss ratio for customers older than 50 for last 10 days"
+    }
+  ]
+}
